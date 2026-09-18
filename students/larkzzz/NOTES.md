@@ -22,3 +22,9 @@
 | release/* | develop | main и develop | подготовка версии к релизу |
 | hotfix/* | main | main и develop | срочный фикс прода |
 | main | — | — | стабильная, production-ветка |
+
+## Полезные команды, которые я использовал
+
+- git status — посмотреть текущее состояние
+- git add <файл> — добавить в staging
+- git commit -m "..." — зафиксировать изменения
