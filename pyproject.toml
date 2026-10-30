@@ -1,0 +1,20 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --cov --cov-report=term-missing --cov-fail-under=100"
+filterwarnings = [
+    "ignore:The anyio.abc.BlockingPortal alias is deprecated:DeprecationWarning",
+]
+markers = [
+    "unit: юнит-тесты без БД",
+    "integration: тесты API через TestClient на реальной БД",
+    "db: тесты схемы, миграций и ограничений PostgreSQL",
+    "e2e: сквозные тесты по HTTP на запущенном сервере",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["app", "alembic"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true

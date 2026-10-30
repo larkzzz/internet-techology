@@ -7,3 +7,6 @@ __pycache__/
 .idea/
 .vscode/
 pgdata/
+.coverage
+coverage.xml
+htmlcov/
