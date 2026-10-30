@@ -26,7 +26,7 @@ def upgrade() -> None:
         sa.Column(
             "created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
         ),
-        sa.CheckConstraint("role IN ('operator', 'admin')", name="ck_users_role"),
+        sa.CheckConstraint("role IN ('operator', 'admin')", name=op.f("ck_users_role")),
         sa.PrimaryKeyConstraint("id", name="pk_users"),
         sa.UniqueConstraint("email", name="uq_users_email"),
     )
@@ -45,7 +45,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("name", sa.String(length=64), nullable=False),
         sa.Column("color", sa.String(length=7), server_default="#6b7280", nullable=False),
-        sa.CheckConstraint("color ~ '^#[0-9A-Fa-f]{6}$'", name="ck_labels_color"),
+        sa.CheckConstraint("color ~ '^#[0-9A-Fa-f]{6}$'", name=op.f("ck_labels_color")),
         sa.PrimaryKeyConstraint("id", name="pk_labels"),
         sa.UniqueConstraint("name", name="uq_labels_name"),
     )
@@ -65,8 +65,8 @@ def upgrade() -> None:
         sa.Column(
             "updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
         ),
-        sa.CheckConstraint("status IN ('open', 'in_progress', 'done')", name="ck_tasks_status"),
-        sa.CheckConstraint("priority IN ('low', 'medium', 'high')", name="ck_tasks_priority"),
+        sa.CheckConstraint("status IN ('open', 'in_progress', 'done')", name=op.f("ck_tasks_status")),
+        sa.CheckConstraint("priority IN ('low', 'medium', 'high')", name=op.f("ck_tasks_priority")),
         sa.ForeignKeyConstraint(
             ["project_id"], ["projects.id"],
             name="fk_tasks_project_id_projects", ondelete="CASCADE",
@@ -91,7 +91,7 @@ def upgrade() -> None:
         sa.Column(
             "created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
         ),
-        sa.CheckConstraint("length(btrim(body)) > 0", name="ck_comments_body_not_empty"),
+        sa.CheckConstraint("length(btrim(body)) > 0", name=op.f("ck_comments_body_not_empty")),
         sa.ForeignKeyConstraint(
             ["task_id"], ["tasks.id"],
             name="fk_comments_task_id_tasks", ondelete="CASCADE",
