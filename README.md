@@ -97,6 +97,47 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
+## Тесты
+
+Тесты написаны на pytest и разделены на четыре группы:
+
+| Папка | Маркер | Что проверяет |
+|---|---|---|
+| `tests/unit` | `unit` | Pydantic-схемы, `crud`, настройки и сессию БД на моках, без PostgreSQL |
+| `tests/integration` | `integration` | все эндпоинты через `TestClient` на реальной БД: коды 200/201/204/404/409/422, фильтры, каскады |
+| `tests/db` | `db` | миграции (upgrade/downgrade, совпадение с моделями, offline-режим), типы колонок, `UNIQUE`, `CHECK`, `CASCADE` / `SET NULL` / `RESTRICT` прямо в PostgreSQL |
+| `tests/e2e` | `e2e` | полный сценарий из задания по HTTP на запущенном Uvicorn |
+
+Покрытие кода `app/` и `alembic/` (включая ветвления) обязано быть 100%, иначе `pytest` завершится с ошибкой.
+
+Тесты используют отдельную базу `taskflow_test` (создаётся автоматически) и откажутся запускаться, если имя базы не оканчивается на `_test`, поэтому данные из основной базы не пострадают.
+
+Запуск в Docker одной командой:
+
+```bash
+docker compose --profile test run --rm --build tests
+```
+
+Только одна группа:
+
+```bash
+docker compose --profile test run --rm --build tests pytest -m unit --no-cov
+```
+
+E2E против уже запущенного `docker compose up` API:
+
+```bash
+docker compose --profile test run --rm --build -e E2E_BASE_URL=http://api:8000 tests pytest tests/e2e --no-cov
+```
+
+Локально (нужен PostgreSQL на `localhost:5432`):
+
+```bash
+pip install -r requirements-dev.txt
+export TEST_DATABASE_URL=postgresql+psycopg2://taskflow:taskflow@localhost:5432/taskflow_test
+pytest
+```
+
 ## Структура
 
 ```text
@@ -109,4 +150,6 @@ app/
   crud.py        # общие операции: 404, PATCH, обработка конфликтов БД (409)
   routers/       # users, projects, labels, tasks, comments
 alembic/versions/0001_initial_schema.py
+tests/
+  unit/ integration/ db/ e2e/
 ```

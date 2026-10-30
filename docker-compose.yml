@@ -28,5 +28,16 @@ services:
       sh -c "alembic upgrade head &&
              exec uvicorn app.main:app --host 0.0.0.0 --port 8000"
 
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    profiles: ["test"]
+    environment:
+      TEST_DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-taskflow}:${POSTGRES_PASSWORD:-taskflow}@db:5432/taskflow_test
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:
