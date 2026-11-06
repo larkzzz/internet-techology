@@ -96,7 +96,8 @@ class TestUniqueAndChecks:
             conn,
             "ck_users_role",
             lambda: insert(
-                conn, "INSERT INTO users (email, display_name, role) VALUES ('x@e.com', 'X', 'root')"
+                conn,
+                "INSERT INTO users (email, display_name, role) VALUES ('x@e.com', 'X', 'root')",
             ),
         )
 

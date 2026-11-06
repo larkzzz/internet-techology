@@ -58,12 +58,15 @@ def test_full_task_lifecycle(api, unique):
     # 5. Статус задачи -> done
     done = check(api.patch(f"/v1/tasks/{task['id']}", json={"status": "done"}), 200)
     assert done["status"] == "done"
-    assert check(
-        api.get("/v1/tasks", params={"project_id": project["id"], "status": "open"}), 200
-    ) == []
+    assert (
+        check(api.get("/v1/tasks", params={"project_id": project["id"], "status": "open"}), 200)
+        == []
+    )
     assert [
         t["id"]
-        for t in check(api.get("/v1/tasks", params={"project_id": project["id"], "status": "done"}), 200)
+        for t in check(
+            api.get("/v1/tasks", params={"project_id": project["id"], "status": "done"}), 200
+        )
     ] == [task["id"]]
 
     # Автора с комментариями удалить нельзя

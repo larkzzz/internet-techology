@@ -1,10 +1,10 @@
 import pytest
+from sqlalchemy import inspect, text
+
 from alembic import command
 from alembic.autogenerate import compare_metadata
 from alembic.config import Config
 from alembic.migration import MigrationContext
-from sqlalchemy import inspect, text
-
 from app.database import Base, engine
 from tests.conftest import PROJECT_ROOT, TABLES, alembic_config
 

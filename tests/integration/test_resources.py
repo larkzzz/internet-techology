@@ -224,7 +224,9 @@ class TestTaskFilters:
         assert self.ids(response) == [tasks["p2_open"]["id"]]
 
     def test_filter_without_matches(self, client, tasks):
-        response = client.get("/v1/tasks", params={"project_id": tasks["p1"], "status": "in_progress"})
+        response = client.get(
+            "/v1/tasks", params={"project_id": tasks["p1"], "status": "in_progress"}
+        )
         assert self.ids(response) == []
 
     def test_unknown_project_returns_empty_list(self, client, tasks):
