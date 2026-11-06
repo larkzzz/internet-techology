@@ -1,5 +1,7 @@
 from collections.abc import Generator
+from typing import Annotated
 
+from fastapi import Depends
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
@@ -7,7 +9,6 @@ from app.config import settings
 
 engine = create_engine(settings.database_url, pool_pre_ping=True)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
-
 
 NAMING_CONVENTION = {
     "ix": "ix_%(table_name)s_%(column_0_name)s",
@@ -28,3 +29,6 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
+
+
+DbSession = Annotated[Session, Depends(get_db)]

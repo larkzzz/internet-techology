@@ -19,6 +19,8 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-taskflow}:${POSTGRES_PASSWORD:-taskflow}@db:5432/${POSTGRES_DB:-taskflow}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LOG_FORMAT: ${LOG_FORMAT:-text}
     ports:
       - "8000:8000"
     depends_on:

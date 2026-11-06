@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated, ClassVar, Literal
+from typing import Annotated, ClassVar, Literal, Self
 
 from pydantic import (
     BaseModel,
@@ -30,7 +30,7 @@ class UpdateModel(InputModel):
     nullable_fields: ClassVar[frozenset[str]] = frozenset()
 
     @model_validator(mode="after")
-    def forbid_null_for_required(self):
+    def forbid_null_for_required(self) -> Self:
         for field in self.model_fields_set - self.nullable_fields:
             if getattr(self, field) is None:
                 raise ValueError(f"Field '{field}' cannot be null")

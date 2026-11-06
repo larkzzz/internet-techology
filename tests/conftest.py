@@ -28,9 +28,7 @@ TABLES = ("comments", "tasks", "labels", "projects", "users")
 
 def _ensure_database_exists(url: str) -> None:
     url = make_url(url)
-    admin_engine = create_engine(
-        url.set(database="postgres"), isolation_level="AUTOCOMMIT"
-    )
+    admin_engine = create_engine(url.set(database="postgres"), isolation_level="AUTOCOMMIT")
     with admin_engine.connect() as conn:
         exists = conn.scalar(
             text("SELECT 1 FROM pg_database WHERE datname = :name"),
@@ -89,3 +87,19 @@ def client(clean_db):
 
     with TestClient(app) as test_client:
         yield test_client
+
+
+@pytest.fixture
+def app_logs(caplog):
+    """Перехватывает логи приложения `taskflow` (у него propagate=False) на уровне DEBUG."""
+    import logging
+
+    from app.logging_config import LOGGER_NAME
+
+    logger = logging.getLogger(LOGGER_NAME)
+    previous_level = logger.level
+    logger.addHandler(caplog.handler)
+    logger.setLevel(logging.DEBUG)
+    yield caplog
+    logger.removeHandler(caplog.handler)
+    logger.setLevel(previous_level)
