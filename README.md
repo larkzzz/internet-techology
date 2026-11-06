@@ -97,6 +97,55 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
+## Логирование
+
+Логи пишутся в stdout (`docker compose logs -f api`) и настраиваются переменными окружения в `.env`:
+
+| Переменная | Значения | По умолчанию |
+|---|---|---|
+| `LOG_LEVEL` | `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL` (регистр не важен) | `INFO` |
+| `LOG_FORMAT` | `text` — для чтения человеком, `json` — одна JSON-строка на запись | `text` |
+
+Что пишется на каждом уровне:
+
+| Уровень | События |
+|---|---|
+| `DEBUG` | чтение записи, параметры фильтров списков, изменяемые поля в PATCH, успешный `/health` |
+| `INFO` | старт и остановка API, каждый HTTP-запрос (метод, путь, код, время), создание / изменение / удаление записей |
+| `WARNING` | запись не найдена (404), конфликт с БД (409), ошибка валидации (422) |
+| `ERROR` | необработанное исключение со стектрейсом; клиент получает `500 Internal server error` без подробностей |
+| `CRITICAL` | `/health` не может подключиться к базе (503) |
+
+Пароли и содержимое запросов в логи не попадают — только идентификаторы записей.
+
+Пример с `LOG_LEVEL=DEBUG`:
+
+```text
+2026-11-06 18:12:00,486 INFO     taskflow.crud: Created Project id=2
+2026-11-06 18:12:00,488 INFO     taskflow.api: POST /v1/projects -> 201 (39.1 ms)
+2026-11-06 18:12:00,505 WARNING  taskflow.crud: Task id=9999 not found
+2026-11-06 18:12:00,518 DEBUG    taskflow.api: Health check passed
+```
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) запускается на каждый push и pull request и состоит из трёх джоб:
+
+| Джоба | Инструмент | Что проверяет |
+|---|---|---|
+| Style | [ruff](https://docs.astral.sh/ruff/) | форматирование (`ruff format --check`) и правила стиля: PEP 8, порядок импортов, именование (`ruff check`) |
+| Static analysis | [mypy](https://mypy-lang.org/) `--strict` | типы во всём коде `app/` и `alembic/env.py` |
+| Tests | pytest + PostgreSQL 16 | все тесты и 100% покрытие кода |
+
+Те же проверки локально:
+
+```bash
+pip install -r requirements-dev.txt
+ruff format --check . && ruff check .
+mypy
+pytest
+```
+
 ## Тесты
 
 Тесты написаны на pytest и разделены на четыре группы:
